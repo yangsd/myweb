@@ -2,6 +2,7 @@ package com.yiyi.core;
 
 import com.mybatisplus.activerecord.Model;
 import com.mybatisplus.annotations.TableId;
+import com.mybatisplus.enums.IdType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.Date;
  **/
 public class BaseModel<T extends Model> extends Model<T> {
 
-    @TableId("id")
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 
     /**
@@ -38,7 +39,7 @@ public class BaseModel<T extends Model> extends Model<T> {
     /**
      * 是否删除
      */
-    private boolean is_delete;
+    private boolean delete;
 
     public Long getId() {
         return id;
@@ -85,11 +86,11 @@ public class BaseModel<T extends Model> extends Model<T> {
         this.modifier = modifier;
     }
 
-    public boolean getIs_delete() {
-        return is_delete;
+    public boolean getDelete() {
+        return delete;
     }
 
-    public void setIs_delete(boolean is_delete) {
-        this.is_delete = is_delete;
+    public void setDelete(boolean delete) {
+        this.delete = delete;
     }
 }

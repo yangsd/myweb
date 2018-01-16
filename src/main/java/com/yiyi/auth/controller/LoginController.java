@@ -1,4 +1,4 @@
-package com.yiyi.login.controller;
+package com.yiyi.auth.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.yiyi;
+package com.yiyi.config;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Configuration;
  * @create 2017-12-12 16:53
  **/
 @Configuration
-@MapperScan("com.yiyi.login.mapper*")
+@MapperScan(basePackages = {"com.yiyi.auth.mapper*"})
 public class MybatisPlusConfig {
 }
