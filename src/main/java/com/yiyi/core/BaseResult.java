@@ -8,18 +8,25 @@ import java.io.Serializable;
  **/
 public class BaseResult implements Serializable{
 
-    private Boolean success;
+    private Boolean isSuccess;
 
     private String code;
 
     private String message;
 
-    public Boolean getSuccess() {
-        return success;
+    public BaseResult() {
     }
 
-    public void setSuccess(Boolean success) {
-        this.success = success;
+    public BaseResult(Boolean isSuccess) {
+        this.isSuccess = isSuccess;
+    }
+
+    public Boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public void setIsSuccess(Boolean success) {
+        isSuccess = success;
     }
 
     public String getCode() {

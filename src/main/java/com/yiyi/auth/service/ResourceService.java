@@ -74,11 +74,11 @@ public class ResourceService {
     }
 
 
-    public String getMenuByRole(String loginid,Long clientId)  {
+    public String getMenuByLoginId(String loginid)  {
 
         StringBuffer menu = new StringBuffer();
 
-        User user = (User)userMapper.findByLoginId(loginid);// 当前用户
+        User user = userMapper.findByLoginId(loginid);// 当前用户
 
         List<Long> roleIds = userRoleRelMapper.findByUserId(user.getId());
 

@@ -39,7 +39,7 @@ public class BaseModel<T extends Model> extends Model<T> {
     /**
      * 是否删除
      */
-    private boolean delete;
+    private boolean delete = false;
 
     public Long getId() {
         return id;

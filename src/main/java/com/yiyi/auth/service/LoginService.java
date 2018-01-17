@@ -26,7 +26,7 @@ public class LoginService {
     private int expire;
 
     public BaseResult login(String userId, String password) {
-        BaseResult result = new BaseResult();
+        BaseResult result = new BaseResult(true);
         //先退出登录
         SecurityUtils.getSecurityManager().logout(SecurityUtils.getSubject());
 
@@ -53,8 +53,8 @@ public class LoginService {
             msg = se.toString();
             logger.error(se.toString());
         }
-        if (StringUtils.isNotBlank(msg)) {
-            result.setSuccess(false);
+        if (StringUtils.isNotEmpty(msg)) {
+            result.setIsSuccess(false);
             result.setMessage(msg);
         }
         return result;

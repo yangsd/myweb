@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 public interface UserMapper extends BaseMapper<User> {
 
-    @Select("select * from auth_user where login_id=#{login_id}")
-    public User findByLoginId(@Param("login_id") String loginId);
+    @Select("select * from auth_user where loginid=#{loginid}")
+    public User findByLoginId(@Param("loginid") String loginId);
 }

@@ -134,10 +134,11 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public KickoutSessionControlFilter getKickoutSessionControlFilter() {
+    public KickoutSessionControlFilter getKickoutSessionControlFilter(CacheManager cacheManager,DefaultWebSessionManager sessionManager) {
 
         KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
-        kickoutSessionControlFilter.setSessionManager(getSessionManager());
+        kickoutSessionControlFilter.setCacheManager(cacheManager);
+        kickoutSessionControlFilter.setSessionManager(sessionManager);
 
         //是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户
         kickoutSessionControlFilter.setKickoutAfter(false);
@@ -249,7 +250,7 @@ public class ShiroConfig {
      * @return
      */
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
+    public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager securityManager,KickoutSessionControlFilter kickoutSessionControlFilter) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
@@ -257,7 +258,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSuccessUrl("/index");
 
         filters.put("authc", getFormAuthenticationFilter());
-        filters.put("kickout", getKickoutSessionControlFilter());
+        filters.put("kickout", kickoutSessionControlFilter);
 
         shiroFilterFactoryBean.setFilters(filters);
 
