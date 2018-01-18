@@ -85,16 +85,6 @@ public class LoginController {
      */
     @RequestMapping(value = "/index", method = {RequestMethod.GET})
     public String index(Model model) {
-
-        Subject subject = SecurityUtils.getSubject();
-
-        String loginid = (String)subject.getPrincipal();
-
-        String menu = resourceService.getMenuByLoginId(loginid);
-
-        logger.info(String.format("菜单：%s",menu));
-
-
         return "index.html";
     }
 

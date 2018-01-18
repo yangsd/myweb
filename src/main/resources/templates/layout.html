@@ -60,7 +60,7 @@
                 <br />
 
                 <!-- sidebar menu -->
-                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu"  v-html="mymenu">
                     <div class="menu_section">
                         <h3>General</h3>
                         <ul class="nav side-menu">
@@ -185,8 +185,7 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-
-
+            ${layoutContent}
         </div>
         <!-- /page content -->
 
@@ -216,21 +215,18 @@
 
 <script>
     new Vue({
-        el: '#msg',
+        el: '#sidebar-menu',
         data: {
-            vos: '',
-            msgto:'',
-            status:'1'
+            mymenu: ""
         },
         methods: {
             showData: function () {
                 var _self = this;
                 $.ajax({
                     type: 'GET',
-                    url: '/getmsg',
-                    data:{"msgto":_self.msgto,"msgstatus":_self.status},
+                    url: '/getmenu',
                     success:function(data) {
-                        _self.vos = data
+                        _self.mymenu = data
                     }
                 });
             }
