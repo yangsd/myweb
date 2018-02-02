@@ -4,7 +4,6 @@ import com.yiyi.auth.service.LoginService;
 import com.yiyi.auth.service.ResourceService;
 import com.yiyi.core.BaseResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,7 +54,7 @@ public class LoginController {
      * @return
      */
     @RequestMapping(value = "/toLogin", method = {RequestMethod.POST})
-    public String toLogin(@Param("loginid")String loginid,@Param("password")String password, RedirectAttributes model, HttpServletRequest request) {
+    public String toLogin(Model model, @RequestParam("loginid")String loginid, @RequestParam("password")String password) {
 
         if (StringUtils.isEmpty(loginid)) {
             model.addAttribute("error_msg", "请输入用户名");
@@ -67,7 +66,6 @@ public class LoginController {
             return "login.html";
         }
 
-        /*modify by wongzhanra*/
         BaseResult result = loginService.login(loginid,password);
         if (!result.isSuccess()) {
             model.addAttribute("error_msg", result.getMessage());
@@ -100,9 +98,19 @@ public class LoginController {
 
         Subject subject = SecurityUtils.getSubject();
 
+        if(subject == null){
+            return "";
+        }
+
         String loginid = (String)subject.getPrincipal();
 
+        if(StringUtils.isEmpty(loginid)){
+            return "";
+        }
+
         String menu = resourceService.getMenuByLoginId(loginid);
+
+        logger.info(menu);
 
         return menu;
     }

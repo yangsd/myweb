@@ -1,7 +1,9 @@
 package com.yiyi.auth.controller;
 
-import com.yiyi.auth.model.User;
+import com.yiyi.auth.service.ResourceService;
 import com.yiyi.auth.service.UserService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +23,25 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ResourceService resourceService;
 
     @RequestMapping(value = "test",method = {RequestMethod.GET})
     @ResponseBody
     public String insertTestUser(){
-        User user = new User();
-        user.setLoginid("admin");
-        user.setPassword("admin");
-        user.setUsername("管理员");
-        user.setStatus(1);
-        userService.save(user);
+
+        Subject subject = SecurityUtils.getSubject();
+
+        String loginid = (String)subject.getPrincipal();
+
+        String menu = resourceService.getMenuByLoginId(loginid);
+
+//        User user = new User();
+//        user.setLoginid("admin");
+//        user.setPassword("admin");
+//        user.setUsername("管理员");
+//        user.setStatus(1);
+//        userService.save(user);
         return "success";
     }
 }

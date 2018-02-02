@@ -6,6 +6,9 @@ import org.beetl.ext.spring.BeetlGroupUtilConfiguration;
 import org.beetl.ext.spring.BeetlSpringViewResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternUtils;
 
 /**
  * @author sdyang
@@ -19,6 +22,10 @@ public class MyBeetlConfig {
         BeetlGroupUtilConfiguration beetlGroupUtilConfiguration = new BeetlGroupUtilConfiguration();
         ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader("templates/");
         beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
+
+        ResourcePatternResolver patternResolver = ResourcePatternUtils.getResourcePatternResolver(new DefaultResourceLoader());
+        beetlGroupUtilConfiguration.setConfigFileResource(patternResolver.getResource("classpath:beetl.properties"));
+
         return beetlGroupUtilConfiguration;
     }
 

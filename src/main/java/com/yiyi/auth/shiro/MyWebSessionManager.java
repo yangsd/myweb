@@ -3,15 +3,14 @@ package com.yiyi.auth.shiro;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.DelegatingSession;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
-import org.apache.shiro.web.session.mgt.WebSessionManager;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ import java.io.Serializable;
  * Web Session Manager
  * Created by sdyang on 2017/7/15.
  */
-public class MyWebSessionManager extends DefaultSessionManager implements WebSessionManager {
+public class MyWebSessionManager extends DefaultWebSessionManager {
     private static final Logger logger = LoggerFactory.getLogger(MyWebSessionManager.class);
     private Cookie sessionIdCookie;
     private boolean sessionIdCookieEnabled;

@@ -2,26 +2,24 @@ package com.yiyi.config;
 
 
 import com.yiyi.auth.shiro.KickoutSessionControlFilter;
+import com.yiyi.auth.shiro.MyWebSessionManager;
 import com.yiyi.auth.shiro.RetryLimitHashedCredentialsMatcher;
 import com.yiyi.auth.shiro.UserRealm;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
-import org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.DelegatingFilterProxy;
@@ -39,16 +37,16 @@ import java.util.Map;
 @Configuration
 public class ShiroConfig {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(ShiroConfig.class);
 
     private Map<String, Filter> filters = new HashMap<String, Filter>();
 
     private static Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
 
     @Bean
-    public CacheManager getShiroCacheManager(EhCacheManagerFactoryBean ehcache) {
+    public CacheManager getShiroCacheManager() {
         EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager(ehcache.getObject());
+        ehCacheManager.setCacheManagerConfigFile("classpath:ehcache.xml");
         return ehCacheManager;
     }
 
@@ -75,7 +73,6 @@ public class ShiroConfig {
      */
     @Bean(name = "credentialsMatcher")
     public RetryLimitHashedCredentialsMatcher getCredentialsMatcher(CacheManager shiroCacheManager) {
-        //使用redis作为缓存
         RetryLimitHashedCredentialsMatcher credentialsMatcher = new RetryLimitHashedCredentialsMatcher(shiroCacheManager);
         credentialsMatcher.setHashAlgorithmName("md5");
         credentialsMatcher.setHashIterations(2);
@@ -86,15 +83,15 @@ public class ShiroConfig {
 
 
     @Bean
-    public DefaultWebSessionManager getSessionManager() {
-        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+    public MyWebSessionManager getSessionManager() {
+        MyWebSessionManager sessionManager = new MyWebSessionManager();
         sessionManager.setGlobalSessionTimeout(1800000);
         sessionManager.setDeleteInvalidSessions(true);
         sessionManager.setSessionValidationSchedulerEnabled(false);
 //        sessionManager.setSessionValidationScheduler(getSessionValidationScheduler());
         sessionManager.setSessionDAO(getSessionDAO());
-        sessionManager.setSessionIdCookieEnabled(false);
-//        sessionManager.setSessionIdCookie(getSimpleCookie());
+        sessionManager.setSessionIdCookieEnabled(true);
+        sessionManager.setSessionIdCookie(getSimpleCookie());
         return sessionManager;
     }
 
@@ -103,13 +100,13 @@ public class ShiroConfig {
         return new JavaUuidSessionIdGenerator();
     }
 
-    @Bean
-    public QuartzSessionValidationScheduler getSessionValidationScheduler() {
-        QuartzSessionValidationScheduler sessionValidationScheduler = new QuartzSessionValidationScheduler();
-        sessionValidationScheduler.setSessionValidationInterval(1800000);
-        sessionValidationScheduler.setSessionManager(getSessionManager());
-        return sessionValidationScheduler;
-    }
+//    @Bean
+//    public QuartzSessionValidationScheduler getSessionValidationScheduler() {
+//        QuartzSessionValidationScheduler sessionValidationScheduler = new QuartzSessionValidationScheduler();
+//        sessionValidationScheduler.setSessionValidationInterval(1800000);
+//        sessionValidationScheduler.setSessionManager(getSessionManager());
+//        return sessionValidationScheduler;
+//    }
 
     @Bean
     public EnterpriseCacheSessionDAO getSessionDAO() {
@@ -134,10 +131,10 @@ public class ShiroConfig {
      * @return
      */
     @Bean
-    public KickoutSessionControlFilter getKickoutSessionControlFilter(CacheManager cacheManager,DefaultWebSessionManager sessionManager) {
+    public KickoutSessionControlFilter getKickoutSessionControlFilter(CacheManager shiroCacheManager,MyWebSessionManager sessionManager) {
 
         KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
-        kickoutSessionControlFilter.setCacheManager(cacheManager);
+        kickoutSessionControlFilter.setCacheManager(shiroCacheManager);
         kickoutSessionControlFilter.setSessionManager(sessionManager);
 
         //是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户
@@ -184,7 +181,7 @@ public class ShiroConfig {
      * 安全管理器
      */
     @Bean(name = "securityManager")
-    public DefaultWebSecurityManager getSecurityManager(DefaultWebSessionManager sessionManager,UserRealm userRealm,CacheManager shiroCacheManager) {
+    public DefaultWebSecurityManager getSecurityManager(MyWebSessionManager sessionManager,UserRealm userRealm,CacheManager shiroCacheManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 
         //会话管理
@@ -204,7 +201,7 @@ public class ShiroConfig {
     }
 
     @Bean
-    public AuthorizationAttributeSourceAdvisor getAuthorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager,CacheManager shiroCacheManager) {
+    public AuthorizationAttributeSourceAdvisor getAuthorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager) {
         AuthorizationAttributeSourceAdvisor aasa = new AuthorizationAttributeSourceAdvisor();
         aasa.setSecurityManager(securityManager);
         return new AuthorizationAttributeSourceAdvisor();
@@ -223,27 +220,6 @@ public class ShiroConfig {
         formFilter.setLoginUrl("/login");
         return formFilter;
     }
-
-//     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
-//        <property name="securityManager" ref="securityManager"/>
-//        <property name="loginUrl" value="/login"/>
-//        <property name="filters">
-//            <util:map>
-//                <entry key="authc" value-ref="formAuthenticationFilter"/>
-//                <entry key="sysUser" value-ref="sysUserFilter"/>
-//                <entry key="kickout" value-ref="kickoutSessionControlFilter"/>
-//            </util:map>
-//        </property>
-//        <property name="filterChainDefinitions">
-//            <value>
-//                /login = authc
-//                /logout = logout
-//                /authenticated = authc
-//    /** = kickout,user,sysUser
-//     </value>
-//     </property>
-//     </bean>
-
     /**
      * shiro权限过滤
      *
@@ -268,8 +244,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/login", "anon");//登录
         filterChainDefinitionMap.put("/logout", "logout");//退出
 
-        filterChainDefinitionMap.put("/index", "authc");//首页
-        filterChainDefinitionMap.put("/menu", "authc");//菜单
+//        filterChainDefinitionMap.put("/index", "authc");//首页
 
         filterChainDefinitionMap.put("/**", "kickout");
 

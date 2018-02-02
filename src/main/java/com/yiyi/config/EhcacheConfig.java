@@ -4,14 +4,13 @@ import net.sf.ehcache.CacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author sdyang
  * @create 2018-01-16 14:14
  **/
-@Configuration
+//@Configuration
 public class EhcacheConfig {
 
     @Bean
